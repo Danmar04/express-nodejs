@@ -7,6 +7,12 @@ const app = express();
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const errorController = require('./controllers/errors');
+
+
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
 
 //MIDDLEWARES
 //Parser bodies
@@ -18,8 +24,6 @@ app.use('/admin', adminRoutes);
 
 app.use(shopRoutes);
 
-app.use((req, res, next) => {
-    res.status(404).send(path.join(__dirname, 'views', '404.html'));
-});
+app.use(errorController.getPageNotFound);
 
 app.listen(3000);
