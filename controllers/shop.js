@@ -4,50 +4,59 @@ const Cart = require('../models/cart');
 
 //Obtener todos los productos
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll((products) => {
-        res.render(
-            'shop/product-list',
-            {
-                prods: products,
+    Product.fetchAll()
+        .then(([rows, fieldData]) => {
+            res.render(
+                'shop/product-list', {
+                prods: rows,
                 pageTitle: 'All products',
                 path: '/products',
-                hasProducts: products.length > 0,
+                hasProducts: rows.length > 0,
                 activeShop: true,
                 productCSS: true
-
             }
-        );
-    });
+            );
+        })
+        .catch()
+
 
 };
 
 exports.getProduct = (req, res, next) => {
     const prodId = req.params.productId;
-    Product.findById(prodId, product => {
-        res.render('shop/product-detail', {
-            product: product,
-            pageTitle: 'Product detail',
-            path: '/products'
+    Product.findById(prodId)
+        .then(([product]) => {
+            console.log(product[0]);
+            res.render('shop/product-detail', {
+                product: product[0],
+                pageTitle: 'Product detail',
+                path: '/products'
+            });
+        })
+        .catch((err) => {
+            console.log(err);
         });
-    });
 
 };
 
 exports.getIndex = (req, res, next) => {
-    Product.fetchAll((products) => {
+    Product.fetchAll().then(([rows, fieldData]) => {
         res.render(
             'shop/index',
             {
-                prods: products,
+                prods: rows,
                 pageTitle: 'Shop',
                 path: '/',
-                hasProducts: products.length > 0,
+                hasProducts: rows.length > 0,
                 activeShop: true,
                 productCSS: true
 
             }
         );
-    });
+    }).catch((err) => {
+        console.log(err);
+    });;
+
 };
 
 exports.getCart = (req, res, next) => {

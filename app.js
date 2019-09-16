@@ -7,13 +7,14 @@ const app = express();
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
-const errorController = require('./controllers/errors');
 
+const errorController = require('./controllers/errors');
+const db = require('./util/database');
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
-
+console.log("Iniciando servidor");
 //MIDDLEWARES
 //Parser bodies
 app.use(bodyParser.urlencoded({ extended: false }));

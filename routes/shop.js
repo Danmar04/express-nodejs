@@ -7,12 +7,12 @@ const shopController = require('../controllers/shop');
 const router = express.Router();
 
 
+console.log("Modulo de tienda");
 
 router.get('/', shopController.getIndex);
 
 router.get('/products', shopController.getProducts);
 
-// TODO: Implementar
 router.get('/cart', shopController.getCart);
 router.post('/cart', shopController.postCart);
 router.get('/checkout', shopController.getCheckout);

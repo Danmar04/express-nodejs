@@ -1,14 +1,5 @@
-const fs = require('fs');
-const path = require('path');
-const rootDir = require('../util/path');
-
-const p = path.join(
-    rootDir,
-    'data',
-    'products.json');
-
 const Cart = require('./cart');
-
+const db = require('../util/database');
 
 
 module.exports = class Product {
@@ -21,66 +12,20 @@ module.exports = class Product {
     }
 
     save() {
-        getProductsFromFile(products => {
-            console.log(products);
-            if (this.id) {
-                const existingProductIndex = products.findIndex(prod => prod.id == this.id);
-                const updatedProducts = [...products];
-                updatedProducts[existingProductIndex] = this;
-                fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
-                    if (err) {
-                        console.log(err);
-                    }
-                });
-
-            } else {
-                this.id = Math.floor(Math.random() * (1000 - 1)) + 1;
-                products.push(this);
-                //Escribimos los productos en el json
-                fs.writeFile(p, JSON.stringify(products), (err) => {
-                    if (err) {
-                        console.log(err);
-                    }
-                });
-            }
-        });
+        return db.execute('INSERT INTO products (title, price, imageUrl, description) VALUES (?, ?, ?, ?)',
+            [this.title, this.price, this.imageUrl, this.description]);
     }
 
-    static fetchAll(cb) {
-        getProductsFromFile(cb);
-    }
-
-    static findById(id, cb) {
-        getProductsFromFile(products => {
-            console.log(id);
-            const product = products.find(p => p.id == id);
-            console.log(product);
-            cb(product);
-        });
-    }
 
     static deleteProduct(id) {
-        getProductsFromFile(products => {
-            const product = products.find(prod => prod.id == id);
-            const updatedProducts = products.filter(prod => prod.id != id);
-            fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
-                console.log(err);
-                if (!err) {
-                    Cart.deleteProduct(id, product.price);
-                }
-            });
-        });
+
+    }
+    static fetchAll() {
+        return db.execute('SELECT * FROM products');
     }
 
-}
+    static findById(id) {
+        return db.execute('SELECT * FROM products WHERE id = ?', [id]);
+    }
 
-const getProductsFromFile = cb => {
-    fs.readFile(p, (err, fileContent) => {
-        if (err) {
-            //Leemos los productos del JSOn
-            cb([]);
-        }
-        cb(JSON.parse(fileContent));
-
-    });
 };
