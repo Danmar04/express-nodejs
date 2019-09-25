@@ -18,6 +18,12 @@
                 <input type="password" name="password" id="password">
             </div>
 
+            <% if (error) { %>
+            <div>
+                <p style="color:red"><%=error%></p>
+            </div>
+            <% } %>
+
             <button class="btn" type="submit">Login</button>
         </form>
     </main>
