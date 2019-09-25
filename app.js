@@ -2,13 +2,25 @@ const path = require('path');
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
+//RENDERING MOTOR
 const app = express();
+app.set('view engine', 'ejs');
+app.set('views', 'views');
 
+
+
+//Routers
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 
+//Controllers
 const errorController = require('./controllers/errors');
+
+//DB
 const sequelize = require('./util/database');
 const Product = require('./models/product');
 const User = require('./models/user');
@@ -16,10 +28,10 @@ const Cart = require('./models/cart');
 const CartItem = require('./models/cart-item');
 const Order = require('./models/order');
 const OrderItem = require('./models/order-item');
+var myStore = new SequelizeStore({
+    db: sequelize
+});
 
-
-app.set('view engine', 'ejs');
-app.set('views', 'views');
 
 console.log("Iniciando servidor");
 //MIDDLEWARES
@@ -27,6 +39,14 @@ console.log("Iniciando servidor");
 app.use(bodyParser.urlencoded({ extended: false }));
 //Sirve las carpetas estaticas
 app.use(express.static(path.join(__dirname, 'public')));
+//Sessions
+app.use(session({
+    secret: 'my secret',
+    store: myStore,
+    resave: false,
+    proxy: true,
+    saveUninitialized: false
+}));
 
 app.use((req, res, next) => {
     User.findByPk(1)
@@ -43,6 +63,8 @@ app.use('/admin', adminRoutes);
 
 app.use(shopRoutes);
 
+app.use(authRoutes);
+
 app.use(errorController.getPageNotFound);
 
 //Model relationships
@@ -56,7 +78,7 @@ Order.belongsTo(User);
 User.hasMany(Order);
 Order.belongsToMany(Product, { through: OrderItem });
 
-sequelize
+myStore
     .sync()
     .then(result => {
         // console.log(result);

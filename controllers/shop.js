@@ -14,7 +14,8 @@ exports.getProducts = (req, res, next) => {
             path: '/products',
             hasProducts: products.length > 0,
             activeShop: true,
-            productCSS: true
+            productCSS: true,
+            isAuthenticated: req.session.isLogedIn
         }
         );
     }).catch(err => {
@@ -32,7 +33,8 @@ exports.getProduct = (req, res, next) => {
             res.render('shop/product-detail', {
                 product: product,
                 pageTitle: 'Product detail',
-                path: '/products'
+                path: '/products',
+                isAuthenticated: req.session.isLogedIn
             });
         })
         .catch((err) => {
@@ -50,7 +52,8 @@ exports.getIndex = (req, res, next) => {
                 path: '/',
                 hasProducts: products.length > 0,
                 activeShop: true,
-                productCSS: true
+                productCSS: true,
+                isAuthenticated: req.session.isLogedIn
 
             }
         );
@@ -75,7 +78,8 @@ exports.getCart = (req, res, next) => {
                 path: '/cart',
                 pageTitle: 'Your Cart',
                 products: products,
-                empty: isEmpty
+                empty: isEmpty,
+                isAuthenticated: req.session.isLogedIn
             });
 
         })
@@ -133,10 +137,6 @@ exports.postCartDeleteProduct = (req, res, next) => {
         .catch(err => {
             console.log(err);
         });
-    // Product.findById(prodId, product => {
-    //     Cart.deleteProduct(prodId, product.price);
-    //     res.redirect('/cart');
-    // });
 }
 
 exports.getOrders = (req, res, next) => {
@@ -146,7 +146,8 @@ exports.getOrders = (req, res, next) => {
             res.render('shop/orders', {
                 path: '/orders',
                 pageTitle: 'Your Orders',
-                orders: orders
+                orders: orders,
+                isAuthenticated: req.session.isLogedIn
             });
         })
         .catch((err) => {
@@ -186,6 +187,7 @@ exports.postOrder = (req, res, next) => {
 exports.getCheckout = (req, res, next) => {
     res.render('shop/checkout', {
         path: '/checkout',
-        pageTitle: 'Checkout'
+        pageTitle: 'Checkout',
+        isAuthenticated: req.session.isLogedIn
     });
 };
