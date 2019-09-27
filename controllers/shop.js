@@ -53,7 +53,7 @@ exports.getIndex = (req, res, next) => {
                 hasProducts: products.length > 0,
                 activeShop: true,
                 productCSS: true,
-                isAuthenticated: req.session.isLogedIn
+                isAuthenticated: req.session.isLogedIn,
 
             }
         );

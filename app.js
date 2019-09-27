@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const csrf = require('csurf');
 
 //RENDERING MOTOR
 const app = express();
@@ -32,6 +33,9 @@ var myStore = new SequelizeStore({
     db: sequelize
 });
 
+//Security
+const csrfProtection = csrf();
+
 
 console.log("Iniciando servidor");
 //MIDDLEWARES
@@ -48,6 +52,8 @@ app.use(session({
     saveUninitialized: false
 }));
 
+app.use(csrfProtection);
+
 app.use((req, res, next) => {
     User.findByPk(1)
         .then(user => {
@@ -57,6 +63,13 @@ app.use((req, res, next) => {
         .catch((err) => {
             console.log(err);
         });
+});
+
+//SECURITY CSRF FOR ALL ROUTES
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isLogedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
 });
 
 app.use('/admin', adminRoutes);
