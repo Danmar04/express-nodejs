@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 
+
 const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
@@ -7,7 +8,7 @@ exports.getLogin = (req, res, next) => {
         path: '/login',
         pageTitle: 'Login',
         isAuthenticated: false,
-        error: null
+        errorMessage: req.flash('error')
     });
 };
 
@@ -16,7 +17,7 @@ exports.getSignup = (req, res, next) => {
         path: '/signup',
         pageTitle: 'SignUp',
         isAuthenticated: false,
-        error: null
+        errorMessage: req.flash('error')
     });
 };
 
@@ -33,12 +34,8 @@ exports.postSignup = (req, res, next) => {
         })
         .then(usuario => {
             if (usuario) {
-                return res.render('auth/signup', {
-                    pageTitle: 'Signup',
-                    path: '/signup',
-                    isAuthenticated: false,
-                    error: 'A user alredy exists with that email'
-                })
+                req.flash('error', 'El correo ya está en uso.');
+                return res.redirect('/signup');
             }
             if (!usuario) {
                 return bcrypt.hash(password, 12);
@@ -53,6 +50,8 @@ exports.postSignup = (req, res, next) => {
                 });
                 return newUser.save();
             }
+            req.flash('error', 'Las contraseñas no coinciden.');
+            return res.redirect('/signup');
         })
         .then(result => {
             console.log(result);
@@ -74,12 +73,8 @@ exports.postLogin = (req, res, next) => {
     User.findOne({ where: { email: email } })
         .then((user) => {
             if (!user) {
-                return res.render('auth/login', {
-                    pageTitle: 'Login',
-                    path: 'login',
-                    isAuthenticated: false,
-                    error: 'Usuario / Contraseña inválidos'
-                });
+                req.flash('error', 'Usuario / Contraseña inválidos');
+                return res.redirect('/login');
             }
             bcrypt
                 .compare(password, user.password)
@@ -92,7 +87,8 @@ exports.postLogin = (req, res, next) => {
                             res.redirect('/');
                         });
                     }
-                    res.redirect('/login');
+                    req.flash('error', 'Usuario / Contraseña inválidos');
+                    return res.redirect('/login');
                 })
                 .catch((err) => {
                     console.log(err);

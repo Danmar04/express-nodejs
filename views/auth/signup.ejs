@@ -24,9 +24,9 @@
             </div>
 
 
-            <% if (error) { %>
+            <% if (errorMessage) { %>
             <div>
-                <p style="color:red"><%=error%></p>
+                <p style="color:red"><%=errorMessage%></p>
             </div>
             <% } %>
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">

@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const csrf = require('csurf');
+const flash = require('connect-flash');
 
 //RENDERING MOTOR
 const app = express();
@@ -37,6 +38,7 @@ var myStore = new SequelizeStore({
 const csrfProtection = csrf();
 
 
+
 console.log("Iniciando servidor");
 //MIDDLEWARES
 //Parser bodies
@@ -53,6 +55,7 @@ app.use(session({
 }));
 
 app.use(csrfProtection);
+app.use(flash());
 
 app.use((req, res, next) => {
     User.findByPk(1)
